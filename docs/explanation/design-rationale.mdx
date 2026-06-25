@@ -1,48 +1,53 @@
 ---
 title: "Design Rationale"
-description: "Conceptual overview of the key architectural decisions that shape MIF."
+description: "Conceptual overview of MIF's architectural decisions and the Structured MADR format used to document them."
 ---
 
-MIF's design reflects a set of deliberate architectural choices. This page introduces the reasoning behind those choices. The full decision trail is captured in the [Architecture Decision Records](/adr/).
+MIF's design is documented through Architecture Decision Records (ADRs). This page explains why ADRs matter for MIF and how they are structured.
 
-## Why a Cognitive Triad?
+## Why ADRs?
 
-MIF classifies all memories into three types — `semantic`, `episodic`, and `procedural` — rather than using a flat tag system or a provider-specific vocabulary. This maps directly to Tulving's (1972) taxonomy of human memory systems, which is both well-understood and universally applicable. Specific sub-categorization is handled through namespaces, not additional top-level types.
+MIF makes opinionated choices: a cognitive-triad type system, markdown-canonical with derived JSON-LD, pinned OKF compliance, a configurable decay model. Each of these choices has a reason, a set of alternatives considered, and consequences that ripple through the format.
 
-See [ADR-001](/adr/adr-001-cognitive-triad-taxonomy/) for the full rationale.
+ADRs capture that reasoning in a form that:
 
-## Why Two Formats?
+- Explains *why* a design exists, not just *what* it is
+- Documents the alternatives that were evaluated and rejected
+- Records the trade-offs that were consciously accepted
+- Provides an audit trail as the spec evolves
 
-MIF treats Markdown and JSON-LD as co-equal first-class formats rather than defining one as the source of truth. Markdown serves human authors and integrates with tools like Obsidian; JSON-LD serves machines, validators, and semantic web tooling. The two representations are bidirectionally convertible and semantically equivalent.
+When MIF's design surprises you, the ADRs should explain it.
 
-See [ADR-002](/adr/adr-002-dual-format-design/) for the full rationale.
+## Structured MADR format
 
-## Why Obsidian Compatibility?
+MIF uses the **Structured MADR** format — an extension of [MADR](https://adr.github.io/madr/) (Markdown Architectural Decision Records) that adds:
 
-Obsidian is widely used for personal knowledge management, and many users already have established vault workflows. By adopting YAML frontmatter, wiki-style `[[links]]`, and folder-based organization, MIF memories are valid Obsidian notes. This removes adoption friction without constraining format independence.
+- **YAML frontmatter** for machine-readable status, date, and relationships
+- **Full risk-assessed option analysis** for each considered alternative
+- **Split Positive/Negative/Neutral consequences** instead of a single list
+- **A required Audit section** with code-grounded citations (`file:line` anchors)
 
-See [ADR-003](/adr/adr-003-obsidian-compatibility/) for the full rationale.
+The Audit section is the distinguishing feature: it ties the ADR's claims back to the codebase. A finding that cannot be verified in code is flagged `Status: Pending` rather than asserted.
 
-## Why Three-Tier Trait Inheritance?
+## ADR status values
 
-Ontologies need reusable field definitions that compose cleanly. MIF uses a three-tier model: core traits in `mif-base`, shared cross-domain traits in `shared-traits`, and domain-specific traits in individual ontologies. This avoids repetition while preserving extensibility.
+| Status | Meaning |
+|--------|---------|
+| `proposed` | Under discussion |
+| `accepted` | Decision approved and in effect |
+| `deprecated` | No longer recommended |
+| `superseded` | Replaced by another ADR |
 
-See [ADR-004](/adr/adr-004-three-tier-trait-inheritance/) for the full rationale.
+An amended decision keeps `status: accepted` and documents the change in an `## Amendment` section (see [ADR-007](/docs/adr/adr-007-github-raw-urls-for-schema-ids/)).
 
-## Why Underscore Namespace Prefixes?
+## The 12 ADRs
 
-The three base-type namespaces (`_semantic/`, `_episodic/`, `_procedural/`) use an underscore prefix to distinguish system namespaces from domain content, sort predictably in directory listings, and remain visible in all file browsers.
+MIF's 12 ADRs span three themes:
 
-See [ADR-005](/adr/adr-005-underscore-namespace-prefix/) for the full rationale.
+**Type system and content model** (ADR-001 through ADR-006): the cognitive-triad taxonomy, dual-format design, Obsidian compatibility, three-tier trait inheritance, namespace prefix convention, and entity representation.
 
-## Why Separate EntityData and EntityReference?
+**Schema and identity** (ADR-007, ADR-008): schema `$id` strategy (amended to mif-spec.dev) and the temporal decay model.
 
-Entities appear in two contexts in MIF: as lightweight references in memory content, and as structured data objects when a memory *is* an entity. EntityReference handles the first case; EntityData handles the second. Keeping them distinct avoids schema ambiguity.
+**OKF compliance and specification governance** (ADR-009 through ADR-012): MIF as a superset of OKF, the repositioning to a general content model, markdown-canonical primacy, and OKF conformance as a tested CI invariant.
 
-See [ADR-006](/adr/adr-006-entitydata-vs-entityreference/) for the full rationale.
-
-## Why Memory Decay?
-
-AI systems accumulate memories over time. Without a relevance model, older memories crowd out newer ones. MIF implements configurable decay (none, linear, exponential, step) with type-specific half-life defaults inspired by Ebbinghaus's forgetting curve and the ACT-R model.
-
-See [ADR-008](/adr/adr-008-decay-model-rationale/) for the full rationale.
+Browse them in the [Architecture Decision Records](/docs/adr/) section.

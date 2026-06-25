@@ -21,7 +21,6 @@ All schemas use JSON Schema Draft 2020-12.
 
 ## MIF Document Schema
 
-**File:** `mif.schema.json`
 **ID:** `https://mif-spec.dev/schema/mif.schema.json`
 
 ### Required Fields
@@ -42,9 +41,9 @@ MIF uses three base memory types:
 ```json
 "memoryType": {
   "enum": [
-    "semantic",
-    "episodic",
-    "procedural"
+    "semantic",    // Facts, concepts, decisions, preferences, knowledge
+    "episodic",    // Events, experiences, sessions, incidents
+    "procedural"   // Processes, runbooks, patterns, how-to guides
   ]
 }
 ```
@@ -183,7 +182,7 @@ Ontologies can define extended types that map to these base types via namespace 
 | `P14D` | Medium-term project context |
 | `P30D` | Long-term knowledge, semantic memories |
 
-These values are pragmatic defaults inspired by Ebbinghaus's forgetting curve research, adapted for AI memory systems. See the [MIF Specification](https://mif-spec.dev/specification/overview/) for detailed rationale and scientific background.
+These values are pragmatic validity/freshness defaults. The cognitive-memory rationale for tuning them lives in the AI Memory profile. See the [Specification](https://mif-spec.dev/specification/overview/) for detailed rationale.
 
 #### Provenance
 
@@ -262,7 +261,6 @@ See [Citation Schema](#citation-schema) for full details.
 
 ## Citation Schema
 
-**File:** `citation.schema.json`
 **ID:** `https://mif-spec.dev/schema/citation.schema.json`
 
 ### Required Fields
@@ -347,7 +345,6 @@ Custom roles use namespace prefix: `legal:precedent`, `research:replicates`
 
 ## Ontology Schema
 
-**File:** `ontology.schema.json`
 **ID:** `https://mif-spec.dev/schema/ontology/ontology.schema.json`
 
 ### Structure
@@ -503,8 +500,9 @@ jsonschema.validate(document, schema)
 
 ## Schema URLs
 
-Production schemas are available at:
+Schemas are available at:
 
 - `https://mif-spec.dev/schema/mif.schema.json`
 - `https://mif-spec.dev/schema/citation.schema.json`
 - `https://mif-spec.dev/schema/context.jsonld` (JSON-LD context)
+- `https://mif-spec.dev/schema/ontology/ontology.schema.json`
