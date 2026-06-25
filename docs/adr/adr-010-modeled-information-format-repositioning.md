@@ -251,7 +251,7 @@ that ADR-009 builds on. Mitigations:
 
 ## Links
 
-- [`docs/okf-conformance.md`](../docs/okf-conformance.md) — the pinned OKF v0.1 interoperability surface that MIF's general content model fills (see ADR-009).
+- [`docs/okf-conformance.md`](/docs/explanation/okf-conformance/) — the pinned OKF v0.1 interoperability surface that MIF's general content model fills (see ADR-009).
 
 ## More Information
 

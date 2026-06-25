@@ -212,7 +212,7 @@ independence (own governance). Mitigations:
 
 ## Links
 
-- [`docs/okf-conformance.md`](../docs/okf-conformance.md) — the pinned OKF v0.1 conformance criteria, normative within MIF (the authoritative source; upstream OKF wording is reconstructed/frozen here per that document's provenance note).
+- [`docs/okf-conformance.md`](/docs/explanation/okf-conformance/) — the pinned OKF v0.1 conformance criteria, normative within MIF (the authoritative source; upstream OKF wording is reconstructed/frozen here per that document's provenance note).
 
 ## More Information
 
