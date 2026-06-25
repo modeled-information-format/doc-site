@@ -1,0 +1,48 @@
+---
+title: "Design Rationale"
+description: "Conceptual overview of the key architectural decisions that shape MIF."
+---
+
+MIF's design reflects a set of deliberate architectural choices. This page introduces the reasoning behind those choices. The full decision trail is captured in the [Architecture Decision Records](/adr/).
+
+## Why a Cognitive Triad?
+
+MIF classifies all memories into three types — `semantic`, `episodic`, and `procedural` — rather than using a flat tag system or a provider-specific vocabulary. This maps directly to Tulving's (1972) taxonomy of human memory systems, which is both well-understood and universally applicable. Specific sub-categorization is handled through namespaces, not additional top-level types.
+
+See [ADR-001](/adr/adr-001-cognitive-triad-taxonomy/) for the full rationale.
+
+## Why Two Formats?
+
+MIF treats Markdown and JSON-LD as co-equal first-class formats rather than defining one as the source of truth. Markdown serves human authors and integrates with tools like Obsidian; JSON-LD serves machines, validators, and semantic web tooling. The two representations are bidirectionally convertible and semantically equivalent.
+
+See [ADR-002](/adr/adr-002-dual-format-design/) for the full rationale.
+
+## Why Obsidian Compatibility?
+
+Obsidian is widely used for personal knowledge management, and many users already have established vault workflows. By adopting YAML frontmatter, wiki-style `[[links]]`, and folder-based organization, MIF memories are valid Obsidian notes. This removes adoption friction without constraining format independence.
+
+See [ADR-003](/adr/adr-003-obsidian-compatibility/) for the full rationale.
+
+## Why Three-Tier Trait Inheritance?
+
+Ontologies need reusable field definitions that compose cleanly. MIF uses a three-tier model: core traits in `mif-base`, shared cross-domain traits in `shared-traits`, and domain-specific traits in individual ontologies. This avoids repetition while preserving extensibility.
+
+See [ADR-004](/adr/adr-004-three-tier-trait-inheritance/) for the full rationale.
+
+## Why Underscore Namespace Prefixes?
+
+The three base-type namespaces (`_semantic/`, `_episodic/`, `_procedural/`) use an underscore prefix to distinguish system namespaces from domain content, sort predictably in directory listings, and remain visible in all file browsers.
+
+See [ADR-005](/adr/adr-005-underscore-namespace-prefix/) for the full rationale.
+
+## Why Separate EntityData and EntityReference?
+
+Entities appear in two contexts in MIF: as lightweight references in memory content, and as structured data objects when a memory *is* an entity. EntityReference handles the first case; EntityData handles the second. Keeping them distinct avoids schema ambiguity.
+
+See [ADR-006](/adr/adr-006-entitydata-vs-entityreference/) for the full rationale.
+
+## Why Memory Decay?
+
+AI systems accumulate memories over time. Without a relevance model, older memories crowd out newer ones. MIF implements configurable decay (none, linear, exponential, step) with type-specific half-life defaults inspired by Ebbinghaus's forgetting curve and the ACT-R model.
+
+See [ADR-008](/adr/adr-008-decay-model-rationale/) for the full rationale.
