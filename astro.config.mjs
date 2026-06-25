@@ -4,11 +4,12 @@ import astroMermaid from "astro-mermaid";
 
 export default defineConfig({
   site: "https://modeled-information-format.github.io",
-  base: "/",
+  base: "/docs",
   integrations: [
     astroMermaid(),
     starlight({
       title: "MIF",
+      customCss: ["./src/styles/mif-brand.css"],
       logo: {
         light: "./src/assets/logo-light.svg",
         dark: "./src/assets/logo-dark.svg",

@@ -251,11 +251,12 @@ The MIF JSON-LD context provides vocabulary mappings for semantic web compatibil
 
 Reference the context in your JSON-LD documents:
 
-```json
+```jsonc
 {
   "@context": "https://mif-spec.dev/schema/context.jsonld",
   "@type": "Memory",
-  "@id": "urn:mif:my-memory"
+  "@id": "urn:mif:my-memory",
+  // ... other fields
 }
 ```
 
@@ -421,8 +422,8 @@ def create_mif_memory(
 # Usage
 memory = create_mif_memory(
     content="User prefers dark mode for all applications.",
-    memory_type="semantic",
-    namespace="_semantic/preferences",
+    memory_type="semantic",  # Base memory type
+    namespace="_semantic/preferences",  # Specific categorization via namespace
     tags=["ui", "accessibility"],
     ontology={"id": "mif-base", "version": "1.0.0"}
 )
@@ -435,7 +436,7 @@ print(json.dumps(memory, indent=2))
 ```javascript
 function createMifMemory(content, options = {}) {
   const {
-    memoryType = 'semantic',
+    memoryType = 'semantic',  // Base types: semantic, episodic, procedural
     namespace = '_semantic/knowledge',
     tags,
     ontology
@@ -474,8 +475,8 @@ function createMifMemory(content, options = {}) {
 const memory = createMifMemory(
   'User prefers dark mode for all applications.',
   {
-    memoryType: 'semantic',
-    namespace: '_semantic/preferences',
+    memoryType: 'semantic',  // Base memory type
+    namespace: '_semantic/preferences',  // Specific categorization via namespace
     tags: ['ui', 'accessibility'],
     ontology: { id: 'mif-base', version: '1.0.0' }
   }
@@ -521,7 +522,7 @@ convert_file(Path("ontology.yaml"))
 
 ## See Also
 
-- [Getting Started](/tutorials/getting-started/)
-- [Schema Reference](/reference/schema-reference/)
-- [Migration Guide](/how-to/migration/)
-- [MIF Specification](https://mif-spec.dev/specification/overview/)
+- [Getting Started](/docs/tutorials/getting-started/)
+- [Schema Reference](/docs/reference/schema-reference/)
+- [Migration Guide](/docs/how-to/migration/)
+- [Specification](https://mif-spec.dev/specification/overview/)
