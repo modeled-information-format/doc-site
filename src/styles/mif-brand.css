@@ -1,4 +1,4 @@
-/* MIF brand — maps .claude/skills/mif-brand tokens onto Starlight theme vars.
+/* MIF brand — maps the MIF brand tokens onto Starlight theme vars.
    machine-cyan = primary interactive accent; human-amber = emphasis.
    Dark is the default; the brand lives there. */
 :root {
