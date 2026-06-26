@@ -80,6 +80,14 @@ export default defineConfig({
           label: "Decisions (ADRs)",
           items: [{ autogenerate: { directory: "adr" } }],
         },
+        {
+          label: "MIF ecosystem",
+          items: [
+            { label: "MIF home", link: "https://modeled-information-format.github.io/" },
+            { label: "Research harness", link: "https://modeled-information-format.github.io/research-harness/" },
+            { label: "Specification (mif-spec.dev)", link: "https://mif-spec.dev" },
+          ],
+        },
       ],
     }),
   ],
