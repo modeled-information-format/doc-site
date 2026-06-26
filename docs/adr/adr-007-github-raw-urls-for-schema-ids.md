@@ -195,17 +195,18 @@ https://mif-spec.dev/schema/ontology/ontology.schema.json
 https://mif-spec.dev/schema/definitions/entity-reference.schema.json
 ```
 
-The JSON-LD namespace IRI — the base the vocabulary terms resolve against —
-**intentionally** remains on GitHub raw content:
+The JSON-LD namespace IRI — the base the vocabulary terms resolve against — now
+also resolves on the `mif-spec.dev` domain (see the 2026-06 amendment):
 
 ```
-https://raw.githubusercontent.com/zircote/MIF/main/ns/
+https://mif-spec.dev/ns/
 ```
 
-This split is deliberate: the namespace IRI is a stable term identifier whose
-exact string is baked into every published JSON-LD `@context`, while the schema
-`$id` URLs are allowed to track hosting via the `mif-spec.dev` domain. Schema
-`$ref` values continue to use relative paths within the repository.
+Both the schema `$id` URLs and the namespace IRI are served from `mif-spec.dev`
+via GitHub Pages, keeping every normative identifier on a single,
+location-independent domain. The namespace IRI is a stable term identifier whose
+exact string is baked into every published JSON-LD `@context`. Schema `$ref`
+values continue to use relative paths within the repository.
 
 ## Consequences
 
@@ -257,7 +258,7 @@ dereferenceable), low infrastructure (GitHub Pages), and identifier stability
 
 ## More Information
 
-- **Date:** 2026-01-27 (original); amended 2026-02
+- **Date:** 2026-01-27 (original); amended 2026-02 and 2026-06
 - **Source:** `schema/mif.schema.json` and sibling schema `$id` values; `schema/context.jsonld`; `ns/README.md`.
 - **Related ADRs:** ADR-002, ADR-011
 
@@ -287,6 +288,22 @@ drafts recorded placeholder domains that never existed and were hallucinated:
 `mif.io`, `subcog.io`, and `subcog.dev`. All three were purged — first replaced
 by GitHub raw URLs in v0.1.0, then (for schema `$id`) by `mif-spec.dev` in the
 2026-02 amendment. No published MIF artifact references any of these domains.
+
+### 2026-06 — namespace IRI → `mif-spec.dev`
+
+The repository was transferred from the personal account to the
+`modeled-information-format` GitHub organization. The JSON-LD namespace prefix
+(`ns/`), which the 2026-02 amendment had deliberately left on
+`https://raw.githubusercontent.com/zircote/MIF/main/ns/`, is migrated to
+`https://mif-spec.dev/ns/`. This completes the move of every canonical spec and
+schema identifier onto the `mif-spec.dev` custom domain.
+
+**Rationale for amendment:** The org transfer made the personal raw path a
+liability rather than a stable anchor. Co-locating the namespace IRI with the
+schema `$id` scheme on `mif-spec.dev` removes the personal-account dependency
+and keeps all normative identifiers on a single location-independent domain. The
+one-time `@context` rewrite is the same class of change the 2026-02 amendment
+deferred; it is taken now alongside the org transfer.
 
 ## Audit
 
