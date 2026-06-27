@@ -84,7 +84,7 @@ export default defineConfig({
           label: "MIF ecosystem",
           items: [
             { label: "MIF home", link: "https://modeled-information-format.github.io/" },
-            { label: "Research harness", link: "https://modeled-information-format.github.io/research-harness/" },
+            { label: "Research harness", link: "https://modeled-information-format.github.io/research-harness-template/" },
             { label: "Specification (mif-spec.dev)", link: "https://mif-spec.dev" },
           ],
         },
