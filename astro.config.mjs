@@ -1,5 +1,6 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import starlightLlmsTxt from "starlight-llms-txt";
 import astroMermaid from "astro-mermaid";
 
 export default defineConfig({
@@ -8,6 +9,7 @@ export default defineConfig({
   integrations: [
     astroMermaid(),
     starlight({
+      plugins: [starlightLlmsTxt()],
       title: "MIF",
       customCss: ["./src/styles/mif-brand.css"],
       logo: {
