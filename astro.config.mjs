@@ -87,6 +87,9 @@ export default defineConfig({
           items: [
             { label: "MIF home", link: "https://modeled-information-format.github.io/" },
             { label: "Research harness", link: "https://modeled-information-format.github.io/research-harness-template/" },
+            { label: "Ontology corpus", link: "https://modeled-information-format.github.io/ontologies/" },
+            { label: "mif-docs plugin", link: "https://github.com/modeled-information-format/mif-docs-plugin" },
+            { label: "Plugin marketplace", link: "https://github.com/modeled-information-format/claude-code-plugins" },
             { label: "Specification (mif-spec.dev)", link: "https://mif-spec.dev" },
           ],
         },
