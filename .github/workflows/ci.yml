@@ -22,10 +22,21 @@ jobs:
       contents: read
       security-events: write
       pull-requests: write
-    uses: >-
-      modeled-information-format/.github/.github/workflows/reusable-sca-osv.yml@f83ee8058630235396f7242580570b26cf3617fa
+    uses: modeled-information-format/.github/.github/workflows/reusable-sca-osv.yml@f83ee8058630235396f7242580570b26cf3617fa
     with:
       fail-on-severity: high
+
+  # SAST: CodeQL, as a thin caller of the org central reusable (consume,
+  # never reinvent). No GitHub-native "default setup" was configured for this
+  # repo; this workflow-based call is the org's standard instead.
+  sast:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    uses: modeled-information-format/.github/.github/workflows/reusable-sast-codeql.yml@f83ee8058630235396f7242580570b26cf3617fa
+    with:
+      languages: 'javascript-typescript,actions'
 
   build:
     name: build
