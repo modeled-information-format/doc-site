@@ -24,7 +24,7 @@ changes a repo's Pages config, `base` path, or deploy mechanism.
 | `ontologies-site` | *(unreleased)* | `/ontologies` (config carried over from `ontologies`) | A linked git worktree of `ontologies` on `feat/starlight-site` — has a `deploy.yml` gated to `push: main`, but that branch has zero workflow runs. Not deployed anywhere yet. | n/a | 6.4.8 / 0.40.0 (drifted behind `ontologies` main since branching) |
 | `claude-code-plugins` | `https://modeled-information-format.github.io/claude-code-plugins/` | `/claude-code-plugins` | Direct self Pages deploy | none in the deploy job (`catalog`/`release` apps are used elsewhere in this repo, not for Pages) | 7.0.4 / 0.41.1 |
 | `structured-madr` | `https://smadr.dev/` (custom domain, CNAME) | `/` | Direct self Pages deploy | none | 7.0.3 / 0.41.1 |
-| `research-harness-template` | `https://modeled-information-format.github.io/research-harness-template/` | `/research-harness-template` (from `harness.config.json → site.base`) | **No Pages of its own** (404 if queried directly) — build-then-notify: `docs.yml`'s `notify-deploy` job fires `repository_dispatch: source-updated` to `modeled-information-format.github.io` on push to `main`, which then rebuilds and redeploys | `pages` (dispatch token scoped to `.github.io`) | 7.0.2 / 0.41.0 |
+| `research-harness-template` | `https://modeled-information-format.github.io/research-harness-template/` | `/research-harness-template` (from `harness.config.json → site.base`) | **No Pages of its own** (404 if queried directly) — build-then-notify: `docs.yml`'s `notify-deploy` job fires `repository_dispatch: source-updated` to `modeled-information-format.github.io` on push to `main`, which then rebuilds and redeploys | `pages` (dispatch token scoped to `.github.io`) | 7.0.3 / 0.41.1 |
 | `mif-docs-plugin` | `https://modeled-information-format.github.io/mif-docs-plugin/` | `/mif-docs-plugin` | Direct self Pages deploy; site lives in `site/` (isolated `package.json`, separate from the plugin's own tooling deps) | none | 6.4.8 / 0.40.0 |
 | `mif-rs` | `https://modeled-information-format.github.io/mif-rs/` (+ `/mif-rs/rustdoc`) | `/mif-rs` | Direct self Pages deploy: builds `cargo doc`, builds the Astro site, copies rustdoc into the site's `dist/rustdoc`, deploys | none | 7.0.6 / 0.41.3 |
 | `gdlc` | *(none)* | — | No Pages deployment of any kind — a Claude Code plugin marketplace, not a docs site | — | — |
@@ -65,12 +65,13 @@ expecting it to serve independently — it never has.
 ## Adding a new site: checklist
 
 1. **Decide direct-deploy vs. compose-into-org-site.** Direct (own
-   `deploy.yml`, own project Pages) is what every repo above does except
-   `doc-site` and `research-harness-template`, which hand off to
-   `modeled-information-format.github.io` instead. Compose-in only makes
-   sense for content meant to live under the org root path structure
-   (`/docs`, `/research-harness-template`) rather than its own subdomain-like
-   path.
+   `deploy.yml`, own project Pages) is what every site-serving repo above
+   does except `.github`, `doc-site`, and `research-harness-template`, which
+   hand off content to `modeled-information-format.github.io` instead
+   (`.github` supplies the root landing content; the other two are checked
+   out and built fresh on each org-site deploy). Compose-in only makes sense
+   for content meant to live under the org root path structure (`/`, `/docs`,
+   `/research-harness-template`) rather than its own subdomain-like path.
 2. **Check this table for a path collision** before choosing a `base`/CNAME —
    see the gotcha above.
 3. **Pick the deploy identity.** Cross-repo checkouts/dispatches use the
