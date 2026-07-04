@@ -16,7 +16,7 @@ changes a repo's Pages config, `base` path, or deploy mechanism.
 
 | Repo | Serves | Base path | Deploy mechanism | App used | Astro / Starlight |
 | --- | --- | --- | --- | --- | --- |
-| `MIF` | `https://mif-spec.dev/` (custom domain, CNAME) | `/` | Direct self Pages deploy (`deploy.yml`) | `ci` (fetches + attestation-verifies `ontologies`' signed release tarball before build, ADR-019) | 7.0.3 / 0.41.1 |
+| `MIF` | `https://mif-spec.dev/` (custom domain, CNAME) | `/` | Direct self Pages deploy (`deploy.yml`) | `ci` (fetches + attestation-verifies `ontologies`' signed release tarball before build, [ADR-019](https://github.com/modeled-information-format/MIF/blob/main/adr/ADR-019-deploy-time-attested-ontology-vendoring.md)) | 7.0.3 / 0.41.1 |
 | `doc-site` | `https://modeled-information-format.github.io/docs/` | `/docs` | **No self deploy** — has no Pages of its own; built fresh and composed by `modeled-information-format.github.io`'s own `deploy.yml` on every run | none directly (the composing repo's job uses `pages`) | 6.4.6 / 0.40.0 |
 | `.github` | root content only (`index.html`, favicon) | `/` | Not deployed from here — `has_pages: true` is a stale, orphaned toggle (no `deploy-pages` workflow in this repo at all); its content is checked out and composed by `modeled-information-format.github.io` | none | n/a |
 | `modeled-information-format.github.io` | `https://modeled-information-format.github.io/` (root + `/docs` + `/research-harness-template`) | `/` (assembly) | Composes **three** sources into one Pages deploy: `.github` (root), `doc-site` (`/docs`), `research-harness-template` (`/research-harness-template`) — checks all three out fresh, assembles, deploys | `pages` (cross-repo checkout token scoped to all three sources) | n/a (assembly only) |
@@ -33,9 +33,9 @@ changes a repo's Pages config, `base` path, or deploy mechanism.
 ## Known gotchas
 
 **A repo composed into `modeled-information-format.github.io` must never also
-enable its own project Pages at the same path.** This already bit once (see
-`pages-path-vs-repo-name-collision` in memory): a same-named org repo with
-Pages enabled shadows the composed subdir the assembly repo serves.
+enable its own project Pages at the same path.** This already bit once: a
+same-named org repo with Pages enabled shadows the composed subdir the
+assembly repo serves.
 `research-harness-template` is the live example of the *latent* version of
 this risk today — it's composed at `/research-harness-template` by
 `.github.io`'s `deploy.yml`, and has no Pages of its own (confirmed 404). If
