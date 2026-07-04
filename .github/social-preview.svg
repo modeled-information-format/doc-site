@@ -1,0 +1,91 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MIF ecosystem documentation — organized by the Diataxis framework: tutorials, how-to guides, reference, and explanation, plus the architecture decision records.">
+  <title>MIF ecosystem documentation — four modes, one mark</title>
+  <desc>Dark field. The chevron-M mark and wordmark. Title "Written Once. Read By Both." Three pillars — tutorials, how-to guides, reference and explanation — beside a diagram of the four Diataxis quadrants around the chevron-M mark.</desc>
+  <defs>
+    <linearGradient id="field" x1="0" y1="0" x2="1280" y2="640" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0A0D13"/>
+      <stop offset="1" stop-color="#0E121B"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="640" fill="url(#field)"/>
+  <rect x="36" y="36" width="1208" height="568" rx="20" fill="none" stroke="#222C3C" stroke-width="2"/>
+
+  <!-- ===== Identity lockup (top-left) ===== -->
+  <g transform="translate(84 66) scale(1.15)" fill="none" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M6 42 L6 6 L24 29" stroke="#34D3E8"/>
+    <path d="M24 29 L42 6 L42 42" stroke="#F5B642"/>
+    <path d="M24 25.6 L27.4 29 L24 32.4 L20.6 29 Z" fill="#E8EEF6" stroke="none"/>
+  </g>
+  <text x="150" y="112" font-family="Menlo, 'SF Mono', 'JetBrains Mono', monospace"
+        font-size="30" font-weight="700" letter-spacing="0.04em" fill="#E8EEF6">MIF Docs</text>
+  <text x="150" y="136" font-family="Menlo, 'SF Mono', 'JetBrains Mono', monospace"
+        font-size="15" fill="#7C8AA0" letter-spacing="0.05em">Ecosystem documentation</text>
+
+  <!-- ===== Title block (left column) ===== -->
+  <text x="84" y="214" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="52" font-weight="700" letter-spacing="-0.02em" fill="#E8EEF6">Written Once. Read By Both.</text>
+  <text x="86" y="252" font-family="Menlo, 'SF Mono', 'JetBrains Mono', monospace"
+        font-size="17" fill="#AEBCCF" letter-spacing="0.01em">Organized by what you need to do, not who wrote it.</text>
+
+  <!-- ===== Three pillars ===== -->
+  <rect x="86" y="316" width="16" height="16" rx="2" fill="#34D3E8"/>
+  <text x="122" y="324" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="24" font-weight="600" fill="#E8EEF6">Tutorials &amp; how-to guides</text>
+  <text x="122" y="350" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="16" fill="#7C8AA0">Learning-oriented and task-oriented, side by side.</text>
+
+  <path d="M94 398 L100.4 404.4 L94 410.8 L87.6 404.4 Z" fill="#E8EEF6"/>
+  <text x="122" y="406" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="24" font-weight="600" fill="#E8EEF6">Reference &amp; explanation</text>
+  <text x="122" y="432" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="16" fill="#7C8AA0">Look it up, or understand why it's shaped this way.</text>
+
+  <circle cx="94" cy="488" r="9" fill="#F5B642"/>
+  <text x="122" y="496" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="24" font-weight="600" fill="#E8EEF6">Decision records</text>
+  <text x="122" y="522" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="16" fill="#7C8AA0">The context and consequences behind every choice.</text>
+
+  <!-- ===== Four-quadrant motif (right column) ===== -->
+  <g transform="translate(671.2 60.56) scale(0.96)">
+    <text x="280" y="114" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="12" letter-spacing="0.1em" fill="#7C8AA0">FOUR MODES, ONE MARK</text>
+
+    <rect x="130" y="130" width="170" height="95" rx="12" fill="#0E121B" stroke="#2E3A4D"/>
+    <circle cx="150" cy="150" r="5" fill="#F5B642"/>
+    <text x="164" y="154" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="13" font-weight="700" fill="#F5B642">Tutorials</text>
+    <text x="146" y="182" font-family="system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12.5" fill="#7C8AA0">Learning-oriented.</text>
+    <text x="146" y="200" font-family="system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12.5" fill="#7C8AA0">Build step by step.</text>
+
+    <rect x="360" y="130" width="170" height="95" rx="12" fill="#0E121B" stroke="#2E3A4D"/>
+    <circle cx="380" cy="150" r="5" fill="#34D3E8"/>
+    <text x="394" y="154" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="13" font-weight="700" fill="#34D3E8">How-to guides</text>
+    <text x="376" y="182" font-family="system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12.5" fill="#7C8AA0">Task-oriented.</text>
+    <text x="376" y="200" font-family="system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12.5" fill="#7C8AA0">Recipes for one job.</text>
+
+    <rect x="130" y="265" width="170" height="95" rx="12" fill="#0E121B" stroke="#2E3A4D"/>
+    <circle cx="150" cy="285" r="5" fill="#34D3E8"/>
+    <text x="164" y="289" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="13" font-weight="700" fill="#34D3E8">Reference</text>
+    <text x="146" y="317" font-family="system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12.5" fill="#7C8AA0">Information-oriented.</text>
+    <text x="146" y="335" font-family="system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12.5" fill="#7C8AA0">Look it up.</text>
+
+    <rect x="360" y="265" width="170" height="95" rx="12" fill="#0E121B" stroke="#2E3A4D"/>
+    <circle cx="380" cy="285" r="5" fill="#F5B642"/>
+    <text x="394" y="289" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="13" font-weight="700" fill="#F5B642">Explanation</text>
+    <text x="376" y="317" font-family="system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12.5" fill="#7C8AA0">Understanding-oriented.</text>
+    <text x="376" y="335" font-family="system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12.5" fill="#7C8AA0">Why it's shaped this way.</text>
+
+    <rect x="290" y="207.5" width="56" height="56" rx="8" fill="#151B27" stroke="#2E3A4D"/>
+    <g transform="translate(303.6 221.1) scale(0.6)" fill="none" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M6 42 L6 6 L24 29" stroke="#34D3E8"/>
+      <path d="M24 29 L42 6 L42 42" stroke="#F5B642"/>
+      <path d="M24 25.6 L27.4 29 L24 32.4 L20.6 29 Z" fill="#E8EEF6" stroke="none"/>
+    </g>
+  </g>
+
+  <!-- ===== Footer locators ===== -->
+  <text x="84" y="572" font-family="Menlo, 'SF Mono', 'JetBrains Mono', monospace"
+        font-size="15" fill="#7C8AA0" letter-spacing="0.01em">modeled-information-format/doc-site</text>
+  <text x="1192" y="572" text-anchor="end" font-family="Menlo, 'SF Mono', 'JetBrains Mono', monospace"
+        font-size="15" fill="#7C8AA0" letter-spacing="0.02em">modeled-information-format.github.io/docs</text>
+</svg>
