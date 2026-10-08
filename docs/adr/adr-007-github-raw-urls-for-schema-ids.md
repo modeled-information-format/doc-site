@@ -229,16 +229,17 @@ values continue to use relative paths within the repository.
 ### Negative
 
 1. **Domain ownership cost**: `mif-spec.dev` must be registered and renewed.
-2. **One-time `@context` rewrite**: Migrating the namespace IRI in 2026-06 was a
-   breaking change to the vocabulary — every published JSON-LD `@context` had to
-   be rewritten once from the GitHub-raw IRI to `https://mif-spec.dev/ns/`.
+2. **Two identifier authorities** *(historical, pre-2026-06)*: for a time the
+   schema `$id` lived on `mif-spec.dev` while the namespace IRI stayed on GitHub
+   raw. The 2026-06 amendment migrated the namespace IRI to `mif-spec.dev/ns/`,
+   closing this split (see the Amendment section).
 
 ### Neutral
 
-1. **Interim split, since unified**: From 2026-02 to 2026-06 schema `$id` lived on
-   `mif-spec.dev` while the namespace IRI stayed on GitHub raw — an intentional
-   transitional state, not drift. The 2026-06 amendment co-located both on
-   `mif-spec.dev`, so a single domain now carries every normative identifier.
+1. **Split was by design, not drift** *(historical, pre-2026-06)*: the
+   schema-vs-namespace URI divergence was an intentional choice, not drift; the
+   2026-06 amendment subsequently unified both onto `mif-spec.dev`. See
+   `ns/README.md` and the Amendment section.
 
 ## Decision Outcome
 
@@ -246,10 +247,10 @@ The custom-domain approach achieves the primary drivers: resolvability (HTTP
 dereferenceable), low infrastructure (GitHub Pages), and identifier stability
 (domain outlives hosting path). Mitigations:
 
-- The interim schema-`$id` vs. namespace-IRI split (2026-02) was documented
-  inline in `ns/README.md` so it read as a decision rather than a bug; the
-  2026-06 amendment then removed the split by migrating the namespace IRI onto
-  `mif-spec.dev`.
+- The schema-`$id` vs. namespace-IRI split (the 2026-02 state) was documented
+  inline in `ns/README.md` as a deliberate decision; the 2026-06 amendment then
+  unified both onto `mif-spec.dev/ns/`, removing the split (see the Amendment
+  section).
 - The amendment preserved the zero-infrastructure benefit of the original
   GitHub-raw decision by keeping delivery on GitHub Pages.
 
@@ -278,10 +279,10 @@ The original decision (2026-01-27) used GitHub raw content URLs
 `$id` values. In 2026-02 this was superseded by migration to the custom domain
 `mif-spec.dev`. Schema `$id` values now use `https://mif-spec.dev/schema/...`.
 
-As of this 2026-02 amendment, the JSON-LD namespace prefix (`ns/`) was **not**
-migrated: it remained on `https://raw.githubusercontent.com/zircote/MIF/main/ns/`
-as the canonical namespace IRI. (The 2026-06 amendment below subsequently
-migrated it to `https://mif-spec.dev/ns/`.)
+The JSON-LD namespace prefix (`ns/`) was **not** migrated at that time: it was
+left on `https://raw.githubusercontent.com/zircote/MIF/main/ns/` as the canonical
+namespace IRI (subsequently migrated to `https://mif-spec.dev/ns/`; see the
+2026-06 amendment below).
 
 **Rationale for amendment:** A custom domain provides URL stability independent
 of repository location, enables proper HTTP content negotiation, and presents a
@@ -304,23 +305,19 @@ The repository was transferred from the personal account to the
 (`ns/`), which the 2026-02 amendment had deliberately left on
 `https://raw.githubusercontent.com/zircote/MIF/main/ns/`, is migrated to
 `https://mif-spec.dev/ns/`. This completes the move of every canonical spec and
-schema identifier onto the `mif-spec.dev` custom domain.
+schema identifier onto the `mif-spec.dev` custom domain and removes the
+schema-`$id`-vs-namespace-IRI split introduced in 2026-02.
 
 **Rationale for amendment:** The org transfer made the personal raw path a
 liability rather than a stable anchor. Co-locating the namespace IRI with the
-schema `$id` scheme on `mif-spec.dev` removes the personal-account dependency
-and keeps all normative identifiers on a single location-independent domain. The
+schema `$id` scheme on `mif-spec.dev` removes the personal-account dependency and
+keeps all normative identifiers on a single location-independent domain. The
 one-time `@context` rewrite is the same class of change the 2026-02 amendment
 deferred; it is taken now alongside the org transfer.
 
 ## Audit
 
 ### 2026-06-18
-
-> **Snapshot as of 2026-06-18** — this audit records the state *before* the
-> 2026-06 namespace-IRI migration documented above, when the schema-`$id`-vs-
-> namespace-IRI split was still in effect. The namespace-IRI rows below reflect
-> that pre-migration state.
 
 **Status:** Compliant
 
@@ -330,18 +327,15 @@ deferred; it is taken now alongside the org transfer.
 |---------|-------|-------|------------|
 | Primary schema `$id` uses the amended `mif-spec.dev` domain | `schema/mif.schema.json` | L3 | compliant |
 | Sibling schema `$id` values also use `mif-spec.dev` (citation, ontology, entity-reference) | `schema/citation.schema.json`, `schema/ontology/ontology.schema.json`, `schema/definitions/entity-reference.schema.json` | L3 (each) | compliant |
-| JSON-LD `@context` namespace prefix `mif` on GitHub raw `ns/` IRI (pre-2026-06-migration state) | `schema/context.jsonld` | L4 | compliant as of this date |
-| The (then-current) schema-`$id`-vs-namespace-IRI split is documented as intentional | `ns/README.md` | L7, L11-L14 | compliant |
+| JSON-LD `@context` namespace prefix `mif` resolves on `https://mif-spec.dev/ns/` (2026-06 amendment) | `schema/context.jsonld`, `schema/ontology/ontology.context.jsonld` | L4-L5 | compliant |
+| Every canonical identifier (schema `$id` and namespace IRI) is on `mif-spec.dev`; no split remains | `ns/README.md` | L7, L11-L14 | compliant |
 
-**Summary:** As of 2026-06-18, the amended state was verified: all four schema
-`$id` values resolve to `https://mif-spec.dev/schema/...`, while the JSON-LD
-namespace IRI at that date still resolved to
-`https://raw.githubusercontent.com/zircote/MIF/main/ns/` in
-`schema/context.jsonld`, with `ns/README.md` documenting the split as
-intentional. The placeholder domains (`mif.io`, `subcog.io`, `subcog.dev`) do
-not appear in any audited artifact. (The 2026-06 amendment subsequently migrated
-the namespace IRI to `https://mif-spec.dev/ns/`; a follow-up audit should verify
-`schema/context.jsonld` reflects that move.)
+**Summary:** The current (amended) state is verified: all four schema `$id`
+values resolve to `https://mif-spec.dev/schema/...`, and the JSON-LD namespace
+IRI resolves to `https://mif-spec.dev/ns/` following the 2026-06 amendment, so
+every canonical identifier is on `mif-spec.dev` and the earlier schema-`$id`-vs-
+namespace-IRI split is closed. `ns/README.md` documents the namespace IRI. The
+placeholder domains (`mif.io`, `subcog.io`, `subcog.dev`) do not appear in any
+audited artifact.
 
-**Action Required:** None as of this snapshot; re-audit `schema/context.jsonld`
-after the 2026-06 namespace-IRI migration lands.
+**Action Required:** None.

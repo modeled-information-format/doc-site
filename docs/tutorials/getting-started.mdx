@@ -1,22 +1,23 @@
 ---
 title: "Getting Started"
-description: "Quick start guide for implementing and using the Modeled Information Format."
+description: "Quick start guide for implementing and using the Modeled Information Format (MIF specification 1.4.1)."
 ---
 
-This guide walks you through implementing the Modeled Information Format (MIF) in your project.
+This guide walks you through implementing the Modeled Information Format (MIF) in your project. It tracks MIF specification 1.4.1.
 
 ## Prerequisites
 
-- Basic understanding of JSON-LD or YAML
+- Basic understanding of YAML and Markdown (JSON-LD is optional)
 - A text editor or IDE
-- (Optional) Python 3.8+ for tooling
+- (Optional) Python 3.10+ and Node.js 22+ for the tooling in the [MIF repository](https://github.com/modeled-information-format/MIF)
 
 ## Quick Start
 
 ### Step 1: Create Your First Concept
 
-A MIF concept is a canonical Markdown file; JSON-LD is a derived projection.
-Start with Markdown:
+A MIF concept is a Markdown file with YAML frontmatter, stored in an OKF
+bundle (a directory of `.md` concept files). The Markdown file is canonical;
+JSON-LD is a projection derived from it. Start with the required fields:
 
 ```markdown
 ---
@@ -28,7 +29,10 @@ created: 2026-01-26T10:00:00Z
 User prefers dark mode for all applications.
 ```
 
-Save this as `my-first-concept.md`.
+The `id` is a UUID: it is the concept's stable identity and survives the file
+being moved or renamed. Save the file inside your bundle as
+`semantic/dark-mode-preference.md`. Its OKF identity is that bundle-relative
+path minus `.md`, so use a readable, path-meaningful slug for the filename.
 
 ### Step 2: Add Metadata
 
@@ -36,7 +40,7 @@ Expand with recommended fields:
 
 ```markdown
 ---
-id: a1b2c3d4-5678-90ab-cdef-1234567890ab
+id: 550e8400-e29b-41d4-a716-446655440000
 type: semantic
 created: 2026-01-26T10:00:00Z
 modified: 2026-01-26T10:00:00Z
@@ -63,46 +67,48 @@ If using a custom ontology, declare it:
 
 ```markdown
 ---
-id: a1b2c3d4-5678-90ab-cdef-1234567890ab
+id: 3f2a9c4e-8b1d-4e6f-a5c7-9d0b2e4f6a81
 type: semantic
 created: 2026-01-26T10:00:00Z
 ontology:
   id: regenerative-agriculture
-  version: "1.0.0"
+  version: "0.1.0"
 namespace: _semantic/livestock
 ---
 
 Herd of 85 Angus-cross beef cattle managed with adaptive multi-paddock grazing.
 ```
 
-## Base Knowledge Types
+## Knowledge Types
 
-Every MIF concept declares one of three base knowledge types:
+MIF uses three base knowledge types, a general taxonomy of how knowledge is structured:
 
 | Type | Description | Use For |
 |------|-------------|---------|
-| `semantic` | Declarative knowledge: facts, concepts, schemas | Decisions, preferences, facts, domain knowledge |
-| `episodic` | Time-bound records: events, incidents | Incidents, changelog/deprecation, timelines |
-| `procedural` | How-to knowledge: processes, patterns | Runbooks, patterns, migration guides, workflows |
+| `semantic` | Facts, concepts, and knowledge | Decisions, preferences, facts, domain knowledge |
+| `episodic` | Events and experiences | Incidents, sessions, conversations, timelines |
+| `procedural` | How-to processes | Runbooks, patterns, migration guides, workflows |
 
 Specific categorization is expressed through namespaces (e.g., `_semantic/decisions`, `_episodic/incidents`).
 
 ## Conformance Levels
 
-MIF supports three conformance levels:
+MIF supports three conformance levels.
 
 ### Level 1: Core (Minimal)
 
-Required fields only:
+Level 1 requires a valid OKF bundle (a directory of `.md` concept files), the
+`id` (UUID), `type`, and `created` frontmatter fields, and a non-empty
+Markdown body. A JSON-LD file on its own is not Level 1 conformant.
 
-```yaml
+```markdown
 ---
-id: uuid-here
+id: 9a4e2b7c-1d3f-4c5a-8e6b-0f2d4a6c8e10
 type: semantic
 created: 2026-01-26T10:00:00Z
 ---
 
-Memory content here.
+Concept content here.
 ```
 
 ### Level 2: Standard (Recommended)
@@ -122,9 +128,18 @@ tags:
   - architecture
 relationships:
   - type: relates-to
-    target: /_semantic/database-requirements.md
+    target: /semantic/database-requirements.md
   - type: supersedes
-    target: /_semantic/sqlite-investigation.md
+    target: /semantic/sqlite-investigation.md
+entities:
+  - "@type": EntityReference
+    entity: { "@id": urn:mif:entity:technology:postgresql }
+    entityType: Technology
+    name: PostgreSQL
+  - "@type": EntityReference
+    entity: { "@id": urn:mif:entity:technology:mysql }
+    entityType: Technology
+    name: MySQL
 ---
 
 # Use PostgreSQL for Data Storage
@@ -142,78 +157,90 @@ PostgreSQL for:
 
 ## Relationships
 
-- relates-to [Database Requirements](/_semantic/database-requirements.md)
-- supersedes [SQLite Investigation](/_semantic/sqlite-investigation.md)
+- relates-to [Database Requirements](/semantic/database-requirements.md)
+- supersedes [SQLite Investigation](/semantic/sqlite-investigation.md)
 ```
 
 Relationships are authoritative in frontmatter and mirrored as OKF-legible
-body markdown links so a generic OKF consumer sees every edge.
+body markdown links, so a generic OKF consumer sees every edge. A target in
+the same bundle is a bundle-relative path, as above; a concept outside the
+bundle is referenced as `urn:mif:<uuid>`.
 
 ### Level 3: Full
 
 Add temporal metadata, provenance, and citations:
 
-```yaml
+```markdown
 ---
-id: uuid-here
+id: 2c8e4a6f-0b1d-4f3a-9c5e-7d9b1f3a5c70
 type: semantic
 created: 2026-01-26T10:00:00Z
 temporal:
-  valid_from: 2026-01-26T00:00:00Z
-  recorded_at: 2026-01-26T10:00:00Z
+  validFrom: 2026-01-26T00:00:00Z
+  recordedAt: 2026-01-26T10:00:00Z
   ttl: P365D
   decay:
     model: exponential
     halfLife: P30D
     strength: 1.0
 provenance:
-  source_type: user_explicit
+  sourceType: user_explicit
   agent: claude-opus-4
   confidence: 0.95
-  trust_level: user_stated
+  trustLevel: user_stated
 citations:
-  - type: documentation
+  - "@type": Citation
+    citationType: documentation
+    citationRole: background
     title: "PostgreSQL Documentation"
     url: https://www.postgresql.org/docs/
-    role: background
     relevance: 0.9
 ---
+
+Concept content here.
 ```
 
-> **Freshness Values:** The `halfLife: P30D` means freshness strength halves every 30 days. Common values: P7D (short-term), P14D (medium-term), P30D (long-term). These are pragmatic validity/freshness defaults; the cognitive-memory rationale lives in the AI Memory profile. See the [Specification](https://mif-spec.dev/specification/overview/) for details.
+> **Freshness Values:** The `halfLife: P30D` means freshness strength halves every 30 days. Common values: P7D (short-term), P14D (medium-term), P30D (long-term). These are pragmatic freshness defaults, not prescriptive values; the cognitive-memory rationale behind them lives in the AI Memory profile. See [Specification §9.3, Freshness Rationale](https://mif-spec.dev/specification/temporal-model/#freshness-rationale) for details.
+
+> **Naming Convention:** Concept frontmatter fields use `camelCase`, and so does the JSON-LD projection (e.g. `validFrom`, `recordedAt`, `sourceType`, `trustLevel`, `citationType`). The `temporal`, `provenance`, `embedding`, and `citations` blocks are carried into the projection unchanged, so author them with the schema's `camelCase` field names. Keys in `.mif/` configuration files (such as `config.yaml`) use `snake_case` instead.
 
 ## Directory Structure
 
-Organize your MIF vault using the three base types:
+Organize your MIF bundle with one directory per base type. A bundle has no
+`memories/` root:
 
 ```
-my-project/
+my-bundle/
 ├── .mif/
-│   ├── config.yaml           # Vault configuration
+│   ├── config.yaml           # Bundle configuration
 │   └── entities/             # Entity definitions
-├── memories/
-│   ├── semantic/             # Facts, concepts, knowledge
-│   │   ├── decisions/
-│   │   ├── knowledge/
-│   │   └── entities/
-│   ├── episodic/             # Events, experiences
-│   │   ├── incidents/
-│   │   └── sessions/
-│   └── procedural/           # Processes, how-to
-│       ├── runbooks/
-│       └── patterns/
-└── ontology.yaml             # Custom ontology (optional)
+├── index.md                  # OKF reserved filename (optional bundle docs)
+├── semantic/                 # Facts, concepts, knowledge
+│   ├── dark-mode-preference.md
+│   └── decisions/
+├── episodic/                 # Events, experiences
+│   └── incidents/
+├── procedural/               # Processes, how-to
+│   └── runbooks/
+└── my-project.ontology.yaml  # Custom ontology (optional)
 ```
+
+Every `.md` file in the bundle other than the OKF reserved filenames
+`index.md` and `log.md` is a concept and needs concept frontmatter, so put
+bundle documentation in `index.md`, not a frontmatter-less `README.md`.
+Directory placement is independent of the frontmatter `namespace`:
+`semantic/dark-mode-preference.md` can declare
+`namespace: _semantic/preferences`.
 
 ## Using Custom Ontologies
 
 ### Create an Ontology
 
 ```yaml
-# ontology.yaml
+# my-project.ontology.yaml
 ontology:
   id: my-project
-  version: "1.0.0"
+  version: "0.1.0"
   description: "Custom ontology for my project"
 
 namespaces:
@@ -235,17 +262,19 @@ entity_types:
         status: { type: string, enum: [planned, active, deprecated] }
 ```
 
-### Reference in Memories
+### Reference in Concepts
 
-```yaml
+```markdown
 ---
-id: feature-dark-mode
+id: 5e7a9c1b-3d5f-4a7c-9e1b-3d5f7a9c1b20
 type: semantic
 created: 2026-01-26T10:00:00Z
 ontology:
   id: my-project
-  version: "1.0.0"
+  version: "0.1.0"
 namespace: _semantic/features
+aliases:
+  - feature-dark-mode
 ---
 
 # Dark Mode Feature
@@ -254,44 +283,64 @@ Status: active
 Priority: high
 ```
 
-## JSON-LD Format
+## JSON-LD Projection
 
-For machine processing, use JSON-LD:
+For machine processing, derive the JSON-LD projection from the Markdown
+source rather than authoring it by hand:
+
+```bash
+# From a checkout of the MIF repository
+python scripts/mif_convert.py emit-jsonld my-bundle --out-dir dist/jsonld
+```
+
+This writes one `.jsonld` file per concept under `dist/jsonld/`, mirroring the
+source paths. The emitted files are build output; do not commit them to the
+bundle. The projection of the Step 2 concept looks like this (`content`
+abbreviated):
 
 ```json
 {
   "@context": "https://mif-spec.dev/schema/context.jsonld",
-  "@type": "Memory",
-  "@id": "urn:mif:a1b2c3d4-5678-90ab-cdef-1234567890ab",
-  "memoryType": "semantic",
-  "content": "User prefers dark mode for all applications.",
+  "@type": "Concept",
+  "@id": "urn:mif:550e8400-e29b-41d4-a716-446655440000",
+  "conceptType": "semantic",
+  "title": "Dark Mode Preference",
+  "content": "# Dark Mode Preference\n\nUser prefers dark mode for all applications including: ...",
   "created": "2026-01-26T10:00:00Z",
-  "ontology": {
-    "@type": "OntologyReference",
-    "id": "mif-base",
-    "version": "1.0.0"
-  },
+  "modified": "2026-01-26T10:00:00Z",
+  "timestamp": "2026-01-26T10:00:00Z",
   "namespace": "_semantic/preferences",
-  "tags": ["ui", "accessibility"]
+  "tags": ["ui", "accessibility", "preference"]
 }
 ```
 
+The concept `@id` is always `urn:mif:<uuid>`, where `<uuid>` is the
+frontmatter `id`. The frontmatter `type` becomes `conceptType`; `memoryType`
+and `@type: "Memory"` are deprecated aliases that are still accepted but
+should not be emitted.
+
 ## Validation
 
-Validate MIF documents using JSON Schema:
+Validate a bundle and its projections from a checkout of the MIF repository:
 
 ```bash
-# Install ajv-cli
-npm install -g ajv-cli
+# OKF bundle shape and relationship links
+python scripts/okf_validate.py my-bundle
 
-# Validate a memory
-npx ajv validate -s https://mif-spec.dev/schema/mif.schema.json -d my-memory.json
+# Install ajv-cli + ajv-formats
+npm install -g ajv-cli ajv-formats
+
+# Validate the JSON-LD projection of a concept.
+# The converter emits .jsonld; ajv-cli reads .json, so validate a .json copy.
+npx ajv validate -s schema/mif.schema.json -r "schema/definitions/*.schema.json" \
+  -d dark-mode-preference.json --spec=draft2020 -c ajv-formats
 
 # Validate a citation
-npx ajv validate -s https://mif-spec.dev/schema/citation.schema.json -d citation.json
+npx ajv validate -s schema/citation.schema.json -r "schema/definitions/*.schema.json" \
+  -d citation.json --spec=draft2020 -c ajv-formats
 
-# Validate an ontology
-npx ajv validate -s https://mif-spec.dev/schema/ontology/ontology.schema.json -d ontology.yaml
+# Validate ontology files (ajv-cli does not read YAML; use the project validator)
+python scripts/validate-ontologies.py
 ```
 
 ## Converting Ontologies
@@ -300,19 +349,25 @@ Convert YAML ontologies to JSON-LD:
 
 ```bash
 # Single file
-python scripts/yaml2jsonld.py ontologies/my-ontology.ontology.yaml
+python scripts/yaml2jsonld.py my-project.ontology.yaml
 
-# All ontologies
-python scripts/yaml2jsonld.py --all
+# Every *.ontology.yaml under a directory
+python scripts/yaml2jsonld.py --all --path <path-to-directory>
 ```
+
+The published ontology corpus lives in the
+[`ontologies` repository](https://github.com/modeled-information-format/ontologies)
+and is served at [`mif-spec.dev/ontologies/`](https://mif-spec.dev/ontologies/).
 
 ## Next Steps
 
 - Read the [full specification](https://mif-spec.dev/specification/overview/)
+- Explore the [example bundles](https://github.com/modeled-information-format/MIF/tree/main/examples) in the MIF repository
 - Review the [Schema Reference](/docs/reference/schema-reference/)
-- Check the [Migration Guide](/docs/how-to/migration/) if converting from other systems
+- Check the [Migration Guide](/docs/how-to/migration/) if upgrading an older bundle or converting from other systems
 
 ## Getting Help
 
 - [GitHub Issues](https://github.com/modeled-information-format/MIF/issues)
 - [Specification](https://mif-spec.dev/specification/overview/)
+- [Contributing Guide](https://github.com/modeled-information-format/MIF/blob/main/CONTRIBUTING.md)

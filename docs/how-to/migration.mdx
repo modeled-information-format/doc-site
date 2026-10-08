@@ -1,32 +1,44 @@
 ---
 title: "Migration"
-description: "Upgrade an existing MIF 0.1.0-draft bundle to 1.0.0."
+description: "Upgrade an existing MIF bundle to the current specification (1.4.1): from 0.1.0-draft to 1.0.0, then across the 1.x releases."
 ---
 
-MIF v1.0.0 repositions MIF as an **OKF-compliant, opinionated knowledge content
-model**. AI memory is now the first *profile* of MIF, not its identity. This
-guide is the how-to for upgrading an existing `0.1.0-draft` bundle. The
-mechanical steps are automated by `scripts/migrate_0_1_to_1_0.py` (in the `modeled-information-format/MIF` repo).
+This guide upgrades an existing MIF bundle to the current specification,
+**MIF 1.4.1**, in two stages:
 
-## TL;DR
+1. [From 0.1.0-draft to 1.0.0](#from-010-draft-to-100), a structural
+   migration automated by `scripts/migrate_0_1_to_1_0.py` (in the
+   `modeled-information-format/MIF` repo).
+2. [From 1.x to 1.4.1](#from-1x-to-141), a short checklist of the changes
+   made across the 1.x releases. No script is needed.
+
+Commands below run from a checkout of the
+[MIF repository](https://github.com/modeled-information-format/MIF).
+
+## From 0.1.0-draft to 1.0.0
+
+MIF v1.0.0 repositions MIF as an **OKF-compliant, opinionated knowledge content
+model**. AI memory is now the first *profile* of MIF, not its identity.
+
+### TL;DR
 
 ```bash
 python scripts/migrate_0_1_to_1_0.py <old-bundle> <new-bundle>
 python scripts/okf_validate.py <new-bundle>     # should print PASS
 ```
 
-## What changed (and why)
+### What changed (and why)
 
 | 0.1.0-draft | 1.0.0 | Why |
 | --- | --- | --- |
 | Legacy `.memory`-infixed markdown files | `*.md` files | The OKF concept ID is the path minus `.md`; a `.memory` infix would leak into the ID. |
-| Relationships as body wiki-links `[[slug]]` only | Authoritative frontmatter `relationships[]` **plus** body `## Relationships` markdown links `[Text](/path/target.md)` | OKF consumers must see every edge as a standard markdown link (Invariant 3). |
-| `id` could be a slug | `id` MUST be a UUID | Stable, location-independent identity (§4.3). Slugs are preserved as `aliases`. |
-| Memory-specific framing in the core spec | Moved to `profiles/ai-memory/` | The core is now a general knowledge model; memory is a profile (Invariant 6). |
-| `*.memory.json` committed beside source | JSON-LD is a **derived** projection (regenerate with `mif_convert.py`) | Markdown is canonical (Invariant 2). |
+| Relationships as body wiki-links `[[slug]]` only | Authoritative frontmatter `relationships[]` **plus** body `## Relationships` markdown links `[Text](/path/target.md)` | OKF consumers must see every edge as a standard markdown link ([Invariant 3](https://mif-spec.dev/specification/overview/#invariants)). |
+| `id` could be a slug | `id` MUST be a UUID | Stable, location-independent identity (§4.1). Slugs are preserved as `aliases`. |
+| Memory-specific framing in the core spec | Moved to `profiles/ai-memory/` | The core is now a general knowledge model; memory is a profile ([Invariant 6](https://mif-spec.dev/specification/overview/#invariants)). |
+| `*.memory.json` committed beside source | JSON-LD is a **derived** projection (regenerate with `mif_convert.py`) | Markdown is canonical ([Invariant 2](https://mif-spec.dev/specification/overview/#invariants)). |
 | Temporal model framed as a cognitive curve | Same math, reframed as **validity windows & freshness** | Answers OKF's open "live vs stale" question; the cognitive-memory rationale lives in the AI Memory profile. |
 
-## Steps the migration script performs
+### Steps the migration script performs
 
 For every legacy `.memory`-infixed markdown file in the source bundle it:
 
@@ -40,17 +52,18 @@ For every legacy `.memory`-infixed markdown file in the source bundle it:
 4. Normalizes timestamps to ISO 8601 (`...Z`).
 
 It does **not** migrate `*.memory.json` files — regenerate the JSON-LD
-projection from the canonical markdown instead:
+projection from the canonical markdown instead, into a separate output
+directory (emitted `.jsonld` files are not committed to the bundle):
 
 ```bash
-python scripts/mif_convert.py emit-jsonld <new-bundle> --out-dir jsonld
+python scripts/mif_convert.py emit-jsonld <new-bundle> --out-dir dist/jsonld
 ```
 
-## Manual follow-up
+### Manual follow-up
 
 - **Relink targets.** Migrated relationship links point at `/target-slug.md`.
   Where the target concept exists in your bundle, adjust the link to its real
-  bundle-relative path. Broken links are tolerated (warnings), so this can be
+  bundle-relative path; a target outside the bundle uses `urn:mif:<uuid>`. Broken links are tolerated (warnings), so this can be
   done incrementally.
 - **Relocate memory framing.** If your bundle's prose leaned on memory
   metaphors, move that narrative under your own profile and keep the core
@@ -58,12 +71,98 @@ python scripts/mif_convert.py emit-jsonld <new-bundle> --out-dir jsonld
 - **Regenerate examples / validate.** Run `python scripts/okf_validate.py` and
   the schema validation in CI (`.github/workflows/validate.yml`) before
   publishing.
+- **Continue to 1.4.1.** The 1.0.0 script output predates the 1.x changes
+  below; apply the [1.x checklist](#from-1x-to-141) next.
+
+## From 1.x to 1.4.1
+
+The 1.x releases tightened several rules without a migration script. Check a
+1.x bundle against each item below, newest release first. The full record is the MIF
+[CHANGELOG](https://github.com/modeled-information-format/MIF/blob/main/CHANGELOG.md).
+
+### 1.4.1
+
+No schema changes: the 1.4.1 schema mirror is byte-identical to 1.4.0's. The
+release coordinates the downstream MIF tools (mif-rs, mif-docs-plugin,
+structured-madr), which pin 1.4.1. Nothing to migrate.
+
+### 1.4.0
+
+- **Concept `@id` is `urn:mif:<uuid>`.** `mif.schema.json` now enforces the
+  UUID, where `<uuid>` is the frontmatter `id`. Projections with slug ids,
+  such as `urn:mif:my-note`, no longer validate. If any concept still has a
+  slug `id`, give it a UUID and keep the slug as an `alias`. Regenerating the
+  projection with `mif_convert.py emit-jsonld` produces the right form.
+- **Relationship targets.** Use a bundle-relative path (for example
+  `/semantic/policy.md`) for a concept in the same bundle, and
+  `urn:mif:<uuid>` for one outside it. Rewrite any `urn:mif:memory:<slug>`
+  target: no concept `@id` can take that form. The `urn:mif:entity:`,
+  `agent:`, `activity:`, `conversation:` and `vector:` sub-namespaces are
+  reserved and never identify a concept.
+- **`@type: Concept` and `conceptType`.** The core spec calls its atomic
+  element a *concept* and its classification *knowledge types* (§4.2). Emit
+  `@type: "Concept"` and `conceptType`. The deprecated `Memory` and
+  `memoryType` are still accepted, and a document carrying only `memoryType`
+  satisfies the required type check, but new output should not use them.
+- **OKF bundle layout.** Concepts live at `/<type>/<slug>.md` (optionally
+  nested below the type directory) with no `memories/` root. JSON-LD is
+  emitted output (`mif_convert.py emit-jsonld --out-dir`), not a file
+  committed beside its source; delete committed `.jsonld` files from the
+  bundle.
+- **Level 1 requires an OKF bundle.** §13.1 Level 1 conformance now requires a
+  valid OKF bundle shape (a directory of `.md` concept files). A JSON-LD-only
+  artifact is no longer Level 1 conformant.
+- **`compressedAt`.** The compression timestamp is `compressedAt` (the spec
+  previously said `compressed_at`; the schema already used `compressedAt`).
+- **Key casing.** `.mif/` configuration keys are snake_case (`default_ttl`,
+  `conformance_level`); concept frontmatter is camelCase (`validFrom`,
+  `sourceType`).
+- **JSON-LD context.** `context.jsonld` no longer defines `Vector`, `vector`,
+  `encoding` or `data`; embeddings use `vectorUri` (§11). It now registers
+  `timestamp`, `description`, `summary` and `compressedAt`.
+
+### 1.3.0
+
+Additive only: the OPTIONAL Container Profile (`*.corpus.json`, ADR-021) for
+transporting a bundle as a single file. Nothing to migrate.
+
+### 1.2.0
+
+Additive only: optional `aliases`, `exemplars` and `negative_examples` fields
+on ontology entity types (ontology schema 1.1.0, ADR-020). Existing ontologies
+remain valid.
+
+### 1.1.0
+
+- **Obsidian conventions removed**
+  ([ADR-017](https://github.com/modeled-information-format/MIF/blob/main/adr/ADR-017-revert-obsidian-compatibility.md), superseding
+  [ADR-003](/docs/adr/adr-003-obsidian-compatibility/)). Replace wiki-link
+  relationships (`[[...]]`) with markdown links in `## Relationships`, and
+  `@[[Name|Type]]` entity references with frontmatter `EntityReference`
+  objects. Block references and embeds are no longer part of the format.
+- The `blocks` field is removed from the schema and converter. Data still
+  carrying a `blocks` object continues to validate (the concept object permits
+  additional properties), but drop it when you next edit the concept.
+
+### Validate the result
+
+```bash
+python scripts/okf_validate.py <bundle>        # OKF bundle shape and links
+python scripts/mif_convert.py emit-jsonld <bundle> --out-dir dist/jsonld
+# then validate the emitted projections as shown in the Schema Reference
+```
+
+See the [Schema Reference](/docs/reference/schema-reference/#validation) for
+the `ajv` commands.
 
 ## Coming from another memory system?
 
-Provider-specific migration guides now live in the AI Memory profile, the first
+Provider-specific migration guides live in the AI Memory profile, the first
 domain profile of MIF: see
 [`profiles/ai-memory/SPECIFICATION.md`](https://github.com/modeled-information-format/MIF/blob/main/profiles/ai-memory/SPECIFICATION.md).
+Worked conversion scripts for Mem0, Zep, Letta, Subcog, Basic Memory and
+LangMem are in the MIF repository's
+[`docs/MIGRATION-GUIDE.md`](https://github.com/modeled-information-format/MIF/blob/main/docs/MIGRATION-GUIDE.md).
 
 ## Need Help?
 

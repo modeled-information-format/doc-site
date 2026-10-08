@@ -8,9 +8,10 @@ tags:
   - markdown
   - compatibility
   - wiki-links
-status: accepted
+status: superseded
+superseded_by: https://github.com/modeled-information-format/MIF/blob/main/adr/ADR-017-revert-obsidian-compatibility.md
 created: 2026-01-27
-updated: 2026-06-18
+updated: 2026-06-29
 author: MIF Maintainers
 project: MIF
 technologies:
@@ -20,6 +21,7 @@ audience:
   - developers
   - architects
 related:
+  - https://github.com/modeled-information-format/MIF/blob/main/adr/ADR-017-revert-obsidian-compatibility.md
   - /docs/adr/adr-002-dual-format-design/
   - /docs/adr/adr-005-underscore-namespace-prefix/
 ---
@@ -28,7 +30,16 @@ related:
 
 ## Status
 
-Accepted
+Superseded by [ADR-017](https://github.com/modeled-information-format/MIF/blob/main/adr/ADR-017-revert-obsidian-compatibility.md).
+
+The Obsidian-specific conventions decided here — wiki-link relationships,
+`@[[Name|Type]]` entity references, block references, and embeds — were never
+implemented by the canonical tooling (the OKF conformance gate requires
+markdown-link relationships; entity references are frontmatter `EntityReference`
+objects), so documenting them created a spec-versus-implementation contradiction
+(issue #183). ADR-017 reverts them. YAML frontmatter, plain-text/local-first
+storage, and folder-as-namespace are retained there. The original decision is
+preserved below for the record.
 
 ## Context
 
@@ -176,7 +187,7 @@ Adopt Obsidian-compatible conventions for MIF's Markdown representation:
 
 ```markdown
 ---
-id: abc123
+id: 550e8400-e29b-41d4-a716-446655440000
 type: semantic
 namespace: _semantic/knowledge
 ---
