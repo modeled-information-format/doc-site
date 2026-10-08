@@ -1,13 +1,13 @@
 ---
 title: "Schema Reference"
-description: "Complete JSON Schema reference for MIF memory documents."
+description: "Complete JSON Schema reference for MIF concept documents (MIF specification 1.4.1)."
 ---
 
 This document provides a complete reference for all MIF JSON Schemas.
 
 ## Overview
 
-MIF provides three JSON Schemas for validation:
+MIF provides three primary JSON Schemas for validation:
 
 | Schema | Purpose | Location |
 |--------|---------|----------|
@@ -15,7 +15,15 @@ MIF provides three JSON Schemas for validation:
 | `citation.schema.json` | Standalone citation validation | `https://mif-spec.dev/schema/citation.schema.json` |
 | `ontology.schema.json` | Ontology definition validation | `https://mif-spec.dev/schema/ontology/ontology.schema.json` |
 
-All schemas use JSON Schema Draft 2020-12.
+Supporting schemas cover the rest of the format:
+`definitions/entity-reference.schema.json` (entity references, `$ref`'d by the
+two schemas above), `document-reference.schema.json` (standalone
+`DocumentReference`, ADR-014), `container.schema.json` (the optional Container
+Profile, ADR-021), and `relationship-types-config.schema.json` (custom
+relationship types declared in `.mif/config.yaml`). Each is served under
+`https://mif-spec.dev/schema/`.
+
+All schemas use JSON Schema Draft 2020-12. Canonical `$id` values are unversioned and stable; each MIF release also publishes an immutable versioned mirror (for example `https://mif-spec.dev/schema/1.4.1/mif.schema.json`, plus `latest/` and the major alias `v1/`) for consumers that need to pin a version. This page tracks MIF specification 1.4.1.
 
 ---
 
@@ -28,18 +36,23 @@ All schemas use JSON Schema Draft 2020-12.
 | Field | Type | Description |
 |-------|------|-------------|
 | `@context` | string/array/object | JSON-LD context |
-| `@type` | `"Memory"` or array containing `"Memory"` | Document type |
-| `@id` | string (pattern: `^urn:mif:`) | Unique identifier |
-| `memoryType` | enum | Memory classification |
-| `content` | string (minLength: 1) | Memory content |
+| `@type` | `"Concept"` (or array containing `"Concept"`; the deprecated alias `"Memory"` is also accepted) | Document type |
+| `@id` | string (pattern: `^urn:mif:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`) | Concept URN `urn:mif:<uuid>`; `<uuid>` is the frontmatter `id` ([Specification §6.1](https://mif-spec.dev/specification/json-ld-format/)) |
+| `conceptType` | enum | Knowledge taxonomy classification |
+| `content` | string (minLength: 1) | Concept content: the Markdown body of the `.md` file, a named property only in the JSON-LD projection |
 | `created` | string (date-time) | Creation timestamp |
 
-### Memory Types
+> `memoryType` is a **deprecated** v0.1 alias for `conceptType`, retained for
+> backward compatibility. New documents MUST use `conceptType`. The schema
+> requires one of the two: a document carrying only `memoryType` still
+> satisfies the type check.
 
-MIF uses three base memory types:
+### Knowledge Types
+
+MIF uses three base knowledge types:
 
 ```jsonc
-"memoryType": {
+"conceptType": {
   "enum": [
     "semantic",    // Facts, concepts, decisions, preferences, knowledge
     "episodic",    // Events, experiences, sessions, incidents
@@ -47,6 +60,8 @@ MIF uses three base memory types:
   ]
 }
 ```
+
+(The deprecated v0.1 alias `memoryType` accepts the same enum.)
 
 | Type | Description | Use For |
 |------|-------------|---------|
@@ -63,10 +78,14 @@ Ontologies can define extended types that map to these base types via namespace 
 | Field | Type | Description |
 |-------|------|-------------|
 | `title` | string | Human-readable title |
+| `description` | string | OKF-recommended description (mapped from MIF `summary`) |
 | `modified` | date-time | Last modification timestamp |
+| `timestamp` | date-time | OKF-recommended mirror of `modified` (or `created`) |
 | `namespace` | string (pattern) | Hierarchical scope |
 | `tags` | array of strings | Classification tags |
 | `aliases` | array of strings | Alternative names |
+| `documents` | array of `DocumentReference` | Source documents carried by reference, not embedded (ADR-014). Each entry has `@type: "DocumentReference"` plus a `url` or an `id`; optional `documentType`, `hash` and other integrity metadata |
+| `properties` | object (string → string/number/boolean/null) | First-class scalar key/value pairs (e.g. from a knowledge-graph literal-object triple) with no concept target, so they cannot be a relationship. Values MUST be scalar; nested objects/arrays are out of scope at Level 1 |
 
 #### Ontology Reference
 
@@ -74,7 +93,7 @@ Ontologies can define extended types that map to these base types via namespace 
 "ontology": {
   "@type": "OntologyReference",
   "id": "ontology-identifier",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "uri": "https://example.com/ontology.yaml"
 }
 ```
@@ -105,16 +124,15 @@ Ontologies can define extended types that map to these base types via namespace 
 | `entity` | Yes | Object with `@id` (pattern: `^urn:mif:entity:`) |
 | `entityType` | No | `Person`, `Organization`, `Technology`, `Concept`, `File` |
 | `name` | No | Display name |
-| `role` | No | Role in memory context |
+| `role` | No | Role in the concept's context |
 
 #### Relationships
 
 ```json
 "relationships": [
   {
-    "@type": "Relationship",
-    "relationshipType": "DerivedFrom",
-    "target": { "@id": "urn:mif:memory:source-id" },
+    "type": "derived-from",
+    "target": "/episodic/source-concept.md",
     "strength": 0.9,
     "metadata": { "reason": "Extracted insight" }
   }
@@ -123,9 +141,8 @@ Ontologies can define extended types that map to these base types via namespace 
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `@type` | Yes | Must be `"Relationship"` |
-| `relationshipType` | Yes | See relationship types below |
-| `target` | Yes | Object with `@id` (pattern: `^urn:mif:`) |
+| `type` | Yes | Kebab-case token (e.g. `derived-from`); optional `ns:` prefix |
+| `target` | Yes | The related concept: a bundle-relative path (e.g. `/semantic/policy.md`) for a concept in the same bundle (RECOMMENDED), or `urn:mif:<uuid>` for one outside it |
 | `strength` | No | 0.0-1.0 relationship strength |
 | `metadata` | No | Additional properties |
 
@@ -133,15 +150,15 @@ Ontologies can define extended types that map to these base types via namespace 
 
 | Type | Description |
 |------|-------------|
-| `RelatesTo` | General relationship |
-| `DerivedFrom` | Created based on source |
-| `Supersedes` | Replaces older memory |
-| `ConflictsWith` | Contradicts another memory |
-| `PartOf` | Component of larger whole |
-| `Implements` | Realizes a concept/pattern |
-| `Uses` | Utilizes a technology/tool |
-| `Created` | Authored by entity |
-| `MentionedIn` | Referenced in memory |
+| `relates-to` | General relationship |
+| `derived-from` | Created based on source |
+| `supersedes` | Replaces an older concept |
+| `conflicts-with` | Contradicts another concept |
+| `part-of` | Component of larger whole |
+| `implements` | Realizes a concept/pattern |
+| `uses` | Utilizes a technology/tool |
+| `created` | Authored by entity |
+| `mentioned-in` | Referenced in a concept |
 
 #### Temporal Metadata
 
@@ -170,19 +187,30 @@ Ontologies can define extended types that map to these base types via namespace 
 | `ttl` | ISO 8601 duration | Time-to-live |
 | `decay.model` | enum | `none`, `linear`, `exponential`, `step` |
 | `decay.halfLife` | ISO 8601 duration | Decay half-life |
-| `decay.currentStrength` | 0.0-1.0 | Current strength |
+| `decay.currentStrength` | 0.0-1.0 | Current strength (alias: `strength` in Markdown frontmatter) |
+| `decay.lastReinforced` | date-time | When the concept was last reinforced |
 | `accessCount` | integer | Times accessed |
 | `lastAccessed` | date-time | Last access time |
+| `reinforcementHistory` | array | Array of reinforcement events (see below) |
+
+**Reinforcement History Entry:**
+
+| Field | Required | Type | Description |
+|-------|----------|------|-------------|
+| `timestamp` | Yes | date-time | When reinforcement occurred |
+| `event` | Yes | string | What triggered the reinforcement |
+| `strengthDelta` | No | number | Strength change amount |
+| `context` | No | string | Additional context about the reinforcement |
 
 **Recommended Half-Life Values:**
 
 | Duration | Use Case |
 |----------|----------|
-| `P7D` | Short-term context, episodic memories |
+| `P7D` | Short-term context, episodic records |
 | `P14D` | Medium-term project context |
-| `P30D` | Long-term knowledge, semantic memories |
+| `P30D` | Long-term knowledge, semantic facts |
 
-These values are pragmatic validity/freshness defaults. The cognitive-memory rationale for tuning them lives in the AI Memory profile. See the [Specification](https://mif-spec.dev/specification/overview/) for detailed rationale.
+These are pragmatic freshness defaults for how quickly knowledge of a given kind loses currency, not prescriptive values; the cognitive-memory rationale behind them lives in the AI Memory profile. See [Specification §9.3, Freshness Rationale](https://mif-spec.dev/specification/temporal-model/#freshness-rationale) for detailed rationale.
 
 #### Provenance
 
@@ -197,7 +225,7 @@ These values are pragmatic validity/freshness defaults. The cognitive-memory rat
 
 | Field | Values | Description |
 |-------|--------|-------------|
-| `sourceType` | `user_explicit`, `user_implicit`, `agent_inferred`, `external_import`, `system_generated` | How memory was created |
+| `sourceType` | `user_explicit`, `user_implicit`, `agent_inferred`, `external_import`, `system_generated` | How the concept was created |
 | `confidence` | 0.0-1.0 | Confidence score |
 | `trustLevel` | `verified`, `user_stated`, `high_confidence`, `moderate_confidence`, `low_confidence`, `uncertain` | Trust classification |
 
@@ -269,7 +297,7 @@ See [Citation Schema](#citation-schema) for full details.
 |-------|------|-------------|
 | `@type` | `"Citation"` | Must be Citation |
 | `citationType` | enum or namespaced | Source category |
-| `citationRole` | enum or namespaced | Relationship to memory |
+| `citationRole` | enum or namespaced | Relationship to the concept |
 | `title` | string (minLength: 1) | Citation title |
 | `url` | URI | Citation URL |
 
@@ -352,7 +380,7 @@ Custom roles use namespace prefix: `legal:precedent`, `research:replicates`
 ```yaml
 ontology:
   id: my-ontology
-  version: "1.0.0"
+  version: "0.1.0"
   description: "Description"
   schema_url: https://example.com/schema
 
@@ -409,7 +437,7 @@ discovery:
 | Field | Description |
 |-------|-------------|
 | `description` | Namespace description |
-| `type_hint` | Default memory type: `semantic`, `episodic`, `procedural` |
+| `type_hint` | Default base knowledge type: `semantic`, `episodic`, `procedural` |
 | `replaces` | Base namespace this replaces |
 | `children` | Child namespaces (recursive) |
 
@@ -455,44 +483,65 @@ discovery:
 
 ### Using ajv-cli
 
+The commands below run from a checkout of the [MIF repository](https://github.com/modeled-information-format/MIF), which holds the schema files and `scripts/mif_convert.py`.
+
 ```bash
 # Install
-npm install -g ajv-cli
+npm install -g ajv-cli ajv-formats
 
-# Validate MIF document
-npx ajv validate -s https://mif-spec.dev/schema/mif.schema.json -d memory.json
+# Validate MIF document (ajv-cli reads .json)
+npx ajv validate -s schema/mif.schema.json -r "schema/definitions/*.schema.json" \
+  -d memory.json --spec=draft2020 -c ajv-formats
 
 # Validate with verbose output
-npx ajv validate -s https://mif-spec.dev/schema/mif.schema.json -d memory.json --verbose
+npx ajv validate -s schema/mif.schema.json -r "schema/definitions/*.schema.json" \
+  -d memory.json --spec=draft2020 -c ajv-formats --verbose
 
-# Validate multiple files
-npx ajv validate -s https://mif-spec.dev/schema/mif.schema.json -d "memories/*.json"
+# Validate a whole bundle: emit its JSON-LD projections, copy each to .json,
+# then validate the copies
+python scripts/mif_convert.py emit-jsonld my-bundle --out-dir dist/jsonld
+find dist/jsonld -name '*.jsonld' -exec sh -c 'cp "$1" "${1%.jsonld}.json"' _ {} \;
+npx ajv validate -s schema/mif.schema.json -r "schema/definitions/*.schema.json" \
+  -d "dist/jsonld/**/*.json" --spec=draft2020 -c ajv-formats
 ```
 
 ### Using Python
 
 ```python
 import json
-import jsonschema
+from pathlib import Path
 
-# Load schema
-with open('schema/mif.schema.json') as f:
-    schema = json.load(f)
+from jsonschema import Draft202012Validator, FormatChecker
+from referencing import Registry, Resource
 
-# Load document
-with open('memory.json') as f:
-    document = json.load(f)
+# Run from a checkout of the MIF repository. Register every local schema by
+# its $id so relative $refs (e.g. ./definitions/entity-reference.schema.json)
+# resolve offline, and check formats such as date-time and uri.
+schemas = {p: json.loads(p.read_text()) for p in Path("schema").rglob("*.schema.json")}
+registry = Registry().with_resources(
+    (s["$id"], Resource.from_contents(s)) for s in schemas.values()
+)
 
-# Validate
-jsonschema.validate(document, schema)
+def validator_for(path: str) -> Draft202012Validator:
+    return Draft202012Validator(
+        schemas[Path(path)], registry=registry, format_checker=FormatChecker()
+    )
+
+document = json.loads(Path("memory.json").read_text())
+for error in validator_for("schema/mif.schema.json").iter_errors(document):
+    print(error.message)
 ```
+
+`FormatChecker` needs the optional format dependencies to enforce `date-time`
+and `uri`
+(`pip install "jsonschema[format]"`).
 
 ### Common Validation Errors
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| `@id must match pattern` | Invalid URN format | Use `urn:mif:` prefix |
-| `memoryType must be equal to one of` | Invalid type | Use valid memory type |
+| `@id must match pattern` | Invalid URN format | Use `urn:mif:<uuid>`, where `<uuid>` is the frontmatter `id` |
+| `conceptType must be equal to one of` | Invalid type | Use valid concept type |
 | `created must match format date-time` | Bad timestamp | Use ISO 8601 format |
 | `namespace must match pattern` | Invalid namespace | Use alphanumeric with `/` separators |
 
@@ -500,9 +549,15 @@ jsonschema.validate(document, schema)
 
 ## Schema URLs
 
-Schemas are available at:
+Production schemas are available at:
 
 - `https://mif-spec.dev/schema/mif.schema.json`
 - `https://mif-spec.dev/schema/citation.schema.json`
-- `https://mif-spec.dev/schema/context.jsonld` (JSON-LD context)
 - `https://mif-spec.dev/schema/ontology/ontology.schema.json`
+- `https://mif-spec.dev/schema/definitions/entity-reference.schema.json`
+- `https://mif-spec.dev/schema/document-reference.schema.json`
+- `https://mif-spec.dev/schema/container.schema.json`
+- `https://mif-spec.dev/schema/relationship-types-config.schema.json`
+- `https://mif-spec.dev/schema/context.jsonld` (JSON-LD context)
+
+During development, reference local files from a checkout of the MIF repository.
