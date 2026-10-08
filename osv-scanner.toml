@@ -5,17 +5,10 @@
 # fix path, and no production exposure. Revisit on each dependency bump.
 #
 # Every other advisory against this lockfile is fixed by an in-range update
-# (astro >= 7.2.8 et al.) or by the postcss-nested -> postcss-selector-parser
-# override in package.json. This file must sit next to package-lock.json.
-
-[[IgnoredVulns]]
-id = "GHSA-238p-pmpm-9mq7"
-# katex 0.16.47, CVSS 2.1 (low). Pulled in only by mermaid (via astro-mermaid),
-# which pins katex ^0.16; the fix is 0.18.2, outside that range. Exploiting it
-# requires prototype pollution that already exists in the page, and the site
-# currently has no mermaid diagrams and no KaTeX math at all.
-# Remove this entry once mermaid accepts katex >= 0.18.2.
-reason = "Low-severity katex advisory requiring pre-existing prototype pollution; only reachable through mermaid, which pins katex ^0.16 (fix is 0.18.2). No untrusted input reaches it. Revisit when mermaid bumps katex."
+# (astro >= 7.2.8 et al.) or by the npm `overrides` in package.json
+# (postcss-nested -> postcss-selector-parser ^7.1.6; katex ^0.18.2, which
+# mermaid otherwise holds at ^0.16). This file must sit next to
+# package-lock.json.
 
 [[IgnoredVulns]]
 id = "GHSA-vfj7-8cjw-p6xm"
