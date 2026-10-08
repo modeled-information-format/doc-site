@@ -98,8 +98,10 @@ MIF supports three conformance levels.
 ### Level 1: Core (Minimal)
 
 Level 1 requires a valid OKF bundle (a directory of `.md` concept files), the
-`id` (UUID), `type`, and `created` frontmatter fields, and a non-empty
-Markdown body. A JSON-LD file on its own is not Level 1 conformant.
+`id` (UUID), `type`, and `created` frontmatter fields, a non-empty Markdown
+body, and relationship edges (when a concept has any) written as markdown
+links in a `## Relationships` section, as in the Level 2 example below. A
+JSON-LD file on its own is not Level 1 conformant.
 
 ```markdown
 ---
@@ -293,8 +295,9 @@ source rather than authoring it by hand:
 python scripts/mif_convert.py emit-jsonld my-bundle --out-dir dist/jsonld
 ```
 
-This writes one `.jsonld` file per concept under `dist/jsonld/`, mirroring the
-source paths. The emitted files are build output; do not commit them to the
+This writes one `.jsonld` file per concept to
+`dist/jsonld/<bundle>/<type>/<slug>.jsonld`, mirroring the source paths (here,
+`dist/jsonld/my-bundle/semantic/dark-mode-preference.jsonld`). The emitted files are build output; do not commit them to the
 bundle. The projection of the Step 2 concept looks like this (`content`
 abbreviated):
 
@@ -332,6 +335,8 @@ npm install -g ajv-cli ajv-formats
 
 # Validate the JSON-LD projection of a concept.
 # The converter emits .jsonld; ajv-cli reads .json, so validate a .json copy.
+python scripts/mif_convert.py emit-jsonld my-bundle --out-dir dist/jsonld
+cp dist/jsonld/my-bundle/semantic/dark-mode-preference.jsonld dark-mode-preference.json
 npx ajv validate -s schema/mif.schema.json -r "schema/definitions/*.schema.json" \
   -d dark-mode-preference.json --spec=draft2020 -c ajv-formats
 
@@ -339,8 +344,10 @@ npx ajv validate -s schema/mif.schema.json -r "schema/definitions/*.schema.json"
 npx ajv validate -s schema/citation.schema.json -r "schema/definitions/*.schema.json" \
   -d citation.json --spec=draft2020 -c ajv-formats
 
-# Validate ontology files (ajv-cli does not read YAML; use the project validator)
-python scripts/validate-ontologies.py
+# Validate ontology files (ajv-cli does not read YAML; use the project validator).
+# Pass --path: with no --path the script looks for the MIF repo's own
+# ontologies/ directory, which moved to the ontologies repo (ADR-018).
+python scripts/validate-ontologies.py --path my-bundle
 ```
 
 ## Converting Ontologies

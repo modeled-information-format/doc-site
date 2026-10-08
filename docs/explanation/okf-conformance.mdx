@@ -78,7 +78,8 @@ bundle:
    `log.md`.
 3. **Relationship synchronization.** Every frontmatter `relationships` entry has
    a corresponding body markdown link in a `## Relationships` section, and every
-   such body link maps back to a frontmatter entry (SPECIFICATION.md §4.4).
+   such body link maps back to a frontmatter entry
+   ([Specification §5.3](https://mif-spec.dev/specification/markdown-format/)).
 4. **Broken links tolerated.** Unresolvable bundle-relative `.md` links are
    reported as warnings, not failures.
 5. **Lossless projection.** The `markdown → json-ld → markdown` round trip is
@@ -98,16 +99,6 @@ bundle:
    a property declared `range: [0.0, 1.0]` rejects a metadata value of `5.0`.
    `inverse`/`symmetric` are declaration-only and not checked (they describe a
    cross-relationship graph shape, not a single relationship's own values).
-
-Run it with:
-
-```bash
-python scripts/okf_validate.py            # examples/ + profiles/*/examples/
-python scripts/okf_validate.py <bundle>   # a specific bundle
-python scripts/mif_convert.py roundtrip <bundle> [<bundle> ...]
-```
-
-Exit code `0` means every concept conforms.
 
 Run it with:
 

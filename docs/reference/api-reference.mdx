@@ -66,7 +66,7 @@ python scripts/yaml2jsonld.py --all
 
 #### Dependencies
 
-- Python 3.8+
+- Python 3.10+
 - PyYAML (`pip install pyyaml`)
 
 ---
@@ -297,53 +297,49 @@ Use the JSON schemas programmatically:
 
 ```python
 import json
-import jsonschema
 from pathlib import Path
 
+from jsonschema import Draft202012Validator, FormatChecker
+from referencing import Registry, Resource
+
+# Run from a checkout of the MIF repository. Register every local schema by
+# its $id so relative $refs (e.g. ./definitions/entity-reference.schema.json)
+# resolve offline, and check formats such as date-time and uri.
+schemas = {p: json.loads(p.read_text()) for p in Path("schema").rglob("*.schema.json")}
+registry = Registry().with_resources(
+    (s["$id"], Resource.from_contents(s)) for s in schemas.values()
+)
+
+def validator_for(path: str) -> Draft202012Validator:
+    return Draft202012Validator(
+        schemas[Path(path)], registry=registry, format_checker=FormatChecker()
+    )
+
+
+def is_valid(instance: dict, schema_path: str) -> bool:
+    errors = list(validator_for(schema_path).iter_errors(instance))
+    for error in errors:
+        print(f"Validation error: {error.message}")
+    return not errors
+
+
 def validate_mif_document(document: dict) -> bool:
-    """Validate a MIF document against the schema."""
-
-    schema_path = Path("schema/mif.schema.json")
-    with open(schema_path) as f:
-        schema = json.load(f)
-
-    try:
-        jsonschema.validate(document, schema)
-        return True
-    except jsonschema.ValidationError as e:
-        print(f"Validation error: {e.message}")
-        return False
+    """Validate a MIF concept's JSON-LD projection."""
+    return is_valid(document, "schema/mif.schema.json")
 
 
 def validate_citation(citation: dict) -> bool:
     """Validate a citation object."""
-
-    schema_path = Path("schema/citation.schema.json")
-    with open(schema_path) as f:
-        schema = json.load(f)
-
-    try:
-        jsonschema.validate(citation, schema)
-        return True
-    except jsonschema.ValidationError as e:
-        print(f"Validation error: {e.message}")
-        return False
+    return is_valid(citation, "schema/citation.schema.json")
 
 
 def validate_ontology(ontology: dict) -> bool:
-    """Validate an ontology definition."""
-
-    schema_path = Path("schema/ontology/ontology.schema.json")
-    with open(schema_path) as f:
-        schema = json.load(f)
-
-    try:
-        jsonschema.validate(ontology, schema)
-        return True
-    except jsonschema.ValidationError as e:
-        print(f"Validation error: {e.message}")
-        return False
+    """Validate an ontology definition (parsed from YAML)."""
+    return is_valid(ontology, "schema/ontology/ontology.schema.json")
 ```
+
+`FormatChecker` needs the optional format dependencies to enforce `date-time`
+and `uri` (`pip install "jsonschema[format]"`).
 
 ### Using ajv (JavaScript/Node.js)
 

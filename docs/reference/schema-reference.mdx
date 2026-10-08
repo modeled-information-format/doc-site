@@ -7,13 +7,21 @@ This document provides a complete reference for all MIF JSON Schemas.
 
 ## Overview
 
-MIF provides three JSON Schemas for validation:
+MIF provides three primary JSON Schemas for validation:
 
 | Schema | Purpose | Location |
 |--------|---------|----------|
 | `mif.schema.json` | Complete MIF document validation | `https://mif-spec.dev/schema/mif.schema.json` |
 | `citation.schema.json` | Standalone citation validation | `https://mif-spec.dev/schema/citation.schema.json` |
 | `ontology.schema.json` | Ontology definition validation | `https://mif-spec.dev/schema/ontology/ontology.schema.json` |
+
+Supporting schemas cover the rest of the format:
+`definitions/entity-reference.schema.json` (entity references, `$ref`'d by the
+two schemas above), `document-reference.schema.json` (standalone
+`DocumentReference`, ADR-014), `container.schema.json` (the optional Container
+Profile, ADR-021), and `relationship-types-config.schema.json` (custom
+relationship types declared in `.mif/config.yaml`). Each is served under
+`https://mif-spec.dev/schema/`.
 
 All schemas use JSON Schema Draft 2020-12. Canonical `$id` values are unversioned and stable; each MIF release also publishes an immutable versioned mirror (for example `https://mif-spec.dev/schema/1.4.1/mif.schema.json`, plus `latest/` and the major alias `v1/`) for consumers that need to pin a version. This page tracks MIF specification 1.4.1.
 
@@ -76,6 +84,7 @@ Ontologies can define extended types that map to these base types via namespace 
 | `namespace` | string (pattern) | Hierarchical scope |
 | `tags` | array of strings | Classification tags |
 | `aliases` | array of strings | Alternative names |
+| `documents` | array of `DocumentReference` | Source documents carried by reference, not embedded (ADR-014). Each entry has `@type: "DocumentReference"` plus a `url` or an `id`; optional `documentType`, `hash` and other integrity metadata |
 | `properties` | object (string → string/number/boolean/null) | First-class scalar key/value pairs (e.g. from a knowledge-graph literal-object triple) with no concept target, so they cannot be a relationship. Values MUST be scalar; nested objects/arrays are out of scope at Level 1 |
 
 #### Ontology Reference
@@ -500,19 +509,32 @@ npx ajv validate -s schema/mif.schema.json -r "schema/definitions/*.schema.json"
 
 ```python
 import json
-import jsonschema
+from pathlib import Path
 
-# Load schema
-with open('schema/mif.schema.json') as f:
-    schema = json.load(f)
+from jsonschema import Draft202012Validator, FormatChecker
+from referencing import Registry, Resource
 
-# Load document
-with open('memory.json') as f:
-    document = json.load(f)
+# Run from a checkout of the MIF repository. Register every local schema by
+# its $id so relative $refs (e.g. ./definitions/entity-reference.schema.json)
+# resolve offline, and check formats such as date-time and uri.
+schemas = {p: json.loads(p.read_text()) for p in Path("schema").rglob("*.schema.json")}
+registry = Registry().with_resources(
+    (s["$id"], Resource.from_contents(s)) for s in schemas.values()
+)
 
-# Validate
-jsonschema.validate(document, schema)
+def validator_for(path: str) -> Draft202012Validator:
+    return Draft202012Validator(
+        schemas[Path(path)], registry=registry, format_checker=FormatChecker()
+    )
+
+document = json.loads(Path("memory.json").read_text())
+for error in validator_for("schema/mif.schema.json").iter_errors(document):
+    print(error.message)
 ```
+
+`FormatChecker` needs the optional format dependencies to enforce `date-time`
+and `uri`
+(`pip install "jsonschema[format]"`).
 
 ### Common Validation Errors
 
@@ -533,6 +555,9 @@ Production schemas are available at:
 - `https://mif-spec.dev/schema/citation.schema.json`
 - `https://mif-spec.dev/schema/ontology/ontology.schema.json`
 - `https://mif-spec.dev/schema/definitions/entity-reference.schema.json`
+- `https://mif-spec.dev/schema/document-reference.schema.json`
+- `https://mif-spec.dev/schema/container.schema.json`
+- `https://mif-spec.dev/schema/relationship-types-config.schema.json`
 - `https://mif-spec.dev/schema/context.jsonld` (JSON-LD context)
 
 During development, reference local files from a checkout of the MIF repository.
