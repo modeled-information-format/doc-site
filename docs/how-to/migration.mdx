@@ -1,15 +1,15 @@
 ---
 title: "Migration"
-description: "Upgrade an existing MIF bundle to the current specification (1.4.1): from 0.1.0-draft to 1.0.0, then across the 1.x releases."
+description: "Upgrade an existing MIF bundle to the current specification (1.4.2): from 0.1.0-draft to 1.0.0, then across the 1.x releases."
 ---
 
 This guide upgrades an existing MIF bundle to the current specification,
-**MIF 1.4.1**, in two stages:
+**MIF 1.4.2**, in two stages:
 
 1. [From 0.1.0-draft to 1.0.0](#from-010-draft-to-100), a structural
    migration automated by `scripts/migrate_0_1_to_1_0.py` (in the
    `modeled-information-format/MIF` repo).
-2. [From 1.x to 1.4.1](#from-1x-to-141), a short checklist of the changes
+2. [From 1.x to 1.4.2](#from-1x-to-142), a short checklist of the changes
    made across the 1.x releases. No script is needed.
 
 Commands below run from a checkout of the
@@ -71,20 +71,21 @@ python scripts/mif_convert.py emit-jsonld <new-bundle> --out-dir dist/jsonld
 - **Regenerate examples / validate.** Run `python scripts/okf_validate.py` and
   the schema validation in CI (`.github/workflows/validate.yml`) before
   publishing.
-- **Continue to 1.4.1.** The 1.0.0 script output predates the 1.x changes
-  below; apply the [1.x checklist](#from-1x-to-141) next.
+- **Continue to 1.4.2.** The 1.0.0 script output predates the 1.x changes
+  below; apply the [1.x checklist](#from-1x-to-142) next.
 
-## From 1.x to 1.4.1
+## From 1.x to 1.4.2
 
 The 1.x releases tightened several rules without a migration script. Check a
 1.x bundle against each item below, newest release first. The full record is the MIF
 [CHANGELOG](https://github.com/modeled-information-format/MIF/blob/main/CHANGELOG.md).
 
-### 1.4.1
+### 1.4.2
 
-No schema changes: the 1.4.1 schema mirror is byte-identical to 1.4.0's. The
+No schema changes: the 1.4.2 schema mirror is byte-identical to 1.4.0's. The
 release coordinates the downstream MIF tools (mif-rs, mif-docs-plugin,
-structured-madr), which pin 1.4.1. Nothing to migrate.
+structured-madr, mnemonic), which pin 1.4.2. Nothing to migrate. (1.4.1 was
+yanked: its release shipped without artifacts, and its content is in 1.4.2.)
 
 ### 1.4.0
 
