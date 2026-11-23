@@ -9,12 +9,3 @@
 # (postcss-nested -> postcss-selector-parser ^7.1.6; katex ^0.18.2, which
 # mermaid otherwise holds at ^0.16). This file must sit next to
 # package-lock.json.
-
-[[IgnoredVulns]]
-id = "GHSA-vfj7-8cjw-p6xm"
-# braces 3.0.3: stack-exhaustion DoS on deeply nested brace patterns. No fixed
-# release exists (3.0.3 is the last affected and latest version). Dev/build-time
-# only, via starlight-llms-txt -> micromatch, where the patterns come from this
-# repo's own build config, never from user input; not part of the deployed
-# static site. Remove this entry once a fixed braces release ships.
-reason = "No fixed braces release exists; build-time-only transitive (starlight-llms-txt -> micromatch) matching repo-authored patterns, never untrusted input; no production exposure. Revisit when braces ships a fix."
