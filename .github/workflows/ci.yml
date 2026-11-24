@@ -22,7 +22,7 @@ jobs:
       contents: read
       security-events: write
       pull-requests: write
-    uses: modeled-information-format/.github/.github/workflows/reusable-sca-osv.yml@f83ee8058630235396f7242580570b26cf3617fa
+    uses: modeled-information-format/.github/.github/workflows/reusable-sca-osv.yml@c72b3fae829318990ba3da9b9d5ea0671ac5151f
     with:
       fail-on-severity: high
 
@@ -35,7 +35,7 @@ jobs:
       contents: read
       actions: read
       packages: read
-    uses: modeled-information-format/.github/.github/workflows/reusable-sast-codeql.yml@f83ee8058630235396f7242580570b26cf3617fa
+    uses: modeled-information-format/.github/.github/workflows/reusable-sast-codeql.yml@c72b3fae829318990ba3da9b9d5ea0671ac5151f
     with:
       languages: 'javascript-typescript,actions'
 
